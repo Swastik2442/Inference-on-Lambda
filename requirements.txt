@@ -1,0 +1,5 @@
+numpy
+scikit-learn
+tensorflow-cpu
+boto3
+aws-lambda-powertools
