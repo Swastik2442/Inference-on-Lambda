@@ -62,7 +62,7 @@ def handler(event: APIGatewayProxyEventV2, _context: LambdaContext):
     route = event.get("queryStringParameters", {}).get("route") # type: ignore
     if route is None:
         return response("Please provide a 'route' Query Parameter", 400)
-    route = unquote_plus(route).strip()
+    route = unquote_plus(route).strip().lower()
 
     # Serve according to Route
     try:
@@ -73,7 +73,6 @@ def handler(event: APIGatewayProxyEventV2, _context: LambdaContext):
                 img_obj_key = event.get("body")
                 if img_obj_key is None or not isUUIDValid(img_obj_key):
                     return response("Please provide a valid Image Key", 400)
-
                 return get_inference(str(img_obj_key).strip())
             case _:
                 return response(
