@@ -10,13 +10,14 @@ import boto3
 
 from constants import WRITE_DIR, BASE_USER_S3_DIR, S3_BUCKET, IMG_INPUT_SHAPE, IMG_SIZE
 
-def response(data, status=200):
+def response(data, error: str | None = None, status: int = 200):
     "Creates a simple JSON Response for the Lambda Function"
     return {
         "statusCode": status,
         "body": json.dumps({
             "status": "success" if status < 400 else "error",
             "data": data,
+            "error": error,
         }),
         "isBase64Encoded": False,
         "headers": {"Content-Type": "application/json"},
@@ -41,7 +42,7 @@ def downloadImage(file_obj_key: str):
 
     file_path = Path(WRITE_DIR, BASE_USER_S3_DIR, file_obj_key)
     if not file_path.exists():
-        boto3.client("s3").download_file(S3_BUCKET, BASE_USER_S3_DIR + file_obj_key, file_path)
+        boto3.client("s3").download_file(S3_BUCKET, BASE_USER_S3_DIR + file_obj_key, file_path.as_posix())
     return file_path
 
 def getImage(img_obj_key: str):
