@@ -4,7 +4,8 @@ from tensorflow.keras.backend import image_data_format # type: ignore
 
 S3_BUCKET = "plantdiseasedetection"
 WRITE_DIR = "/tmp/"
-BASE_USER_S3_DIR = "user-media/"
+USER_MEDIA_S3_DIR = "user-media/"
+USER_MEDIA_LOCAL_DIR = WRITE_DIR + USER_MEDIA_S3_DIR
 
 PDD_MODEL_FILE = "cnn_model.keras"
 PDD_BINARIZER_FILE = "label_transform.pkl"

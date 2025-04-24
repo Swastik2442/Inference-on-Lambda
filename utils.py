@@ -8,7 +8,7 @@ from tensorflow.keras.utils import load_img, img_to_array # type: ignore
 
 import boto3
 
-from constants import WRITE_DIR, BASE_USER_S3_DIR, S3_BUCKET, IMG_INPUT_SHAPE, IMG_SIZE
+from constants import S3_BUCKET, USER_MEDIA_S3_DIR, USER_MEDIA_LOCAL_DIR, IMG_INPUT_SHAPE, IMG_SIZE
 
 def response(data, error: str | None = None, status: int = 200):
     "Creates a simple JSON Response for the Lambda Function"
@@ -30,24 +30,31 @@ def getRandomUUID():
 def isUUIDValid(obj, version=4):
     "Checks whether the given UUID is Valid or not"
     try:
-        uuidObj = uuid.UUID(obj, version=version)
+        uuid.UUID(obj, version=version)
+        return True
     except ValueError:
         return False
-    return str(uuidObj) == obj
 
+um_dir_path = Path(USER_MEDIA_LOCAL_DIR)
 def downloadImage(file_obj_key: str):
     "Downloads a particular Image from S3 if not present locally"
     assert isinstance(file_obj_key, str), "file_obj_key is required to be a String"
     assert isUUIDValid(file_obj_key), "file_obj_key must be a Valid UUID"
 
-    file_path = Path(WRITE_DIR, BASE_USER_S3_DIR, file_obj_key)
+    um_dir_path.mkdir(exist_ok=True)
+    file_path = Path(um_dir_path, file_obj_key)
     if not file_path.exists():
-        boto3.client("s3").download_file(S3_BUCKET, BASE_USER_S3_DIR + file_obj_key, file_path.as_posix())
+        boto3.client("s3").download_file(
+            S3_BUCKET,
+            USER_MEDIA_S3_DIR + file_obj_key,
+            file_path.as_posix()
+        )
     return file_path
 
 def getImage(img_obj_key: str):
     "Returns the Image with the given `img_obj_key` as a Tensor"
     img_path = downloadImage(img_obj_key)
-    img = img_to_array(load_img(img_path, IMG_SIZE))
-    img = img.reshape(*IMG_INPUT_SHAPE) / 255.0
-    return img
+    img = load_img(img_path, target_size=IMG_SIZE)
+    img_data = img_to_array(img)
+    img_data = img_data.reshape(*IMG_INPUT_SHAPE) / 255.0
+    return img_data

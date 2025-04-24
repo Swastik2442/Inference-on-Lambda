@@ -1,4 +1,5 @@
-scikit-learn
-tensorflow-cpu
-boto3
-aws-lambda-powertools
+pillow==11.2.1
+scikit-learn==1.6.1
+tensorflow-cpu==2.19.0
+boto3==1.38.1
+aws-lambda-powertools==3.10.0
