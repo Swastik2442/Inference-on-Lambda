@@ -56,5 +56,5 @@ def getImage(img_obj_key: str):
     img_path = downloadImage(img_obj_key)
     img = load_img(img_path, target_size=IMG_SIZE)
     img_data = img_to_array(img)
-    img_data = img_data.reshape(*IMG_INPUT_SHAPE) / 255.0
+    img_data = img_data.reshape(*IMG_INPUT_SHAPE)# / 255.0
     return img_data
