@@ -4,6 +4,7 @@ import pickle
 from urllib.parse import unquote_plus
 from typing import Dict, Any
 
+import numpy as np
 from tensorflow.keras.models import load_model # type: ignore
 
 import boto3
@@ -46,7 +47,8 @@ def get_inference(img_obj_key: str):
     data = getImage(img_obj_key)
     preds = model.predict(data)
     pred = label_binarizer.inverse_transform(preds)[0]
-    return response(pred)
+    prob = float(preds[0][np.argmax(preds)])
+    return response({ "class_name": pred, "probability": prob })
 
 ROUTES = {"GET_UPLOAD_URL": "upload", "GET_INFERENCE": "getinf"}
 ROUTE_ERR_MSG = f"'route' Parameter can only be either `{ROUTES['GET_UPLOAD_URL']}` or `{ROUTES['GET_INFERENCE']}`"
