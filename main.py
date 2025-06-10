@@ -1,4 +1,4 @@
-"AWS Lambda code for returning Plant Disease Prediction for the given Image"
+"AWS Lambda code for returning Classification Prediction for the given Image"
 
 import pickle
 from urllib.parse import unquote_plus
@@ -12,19 +12,19 @@ from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.data_classes import LambdaFunctionUrlEvent
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
-from constants import S3_BUCKET, USER_MEDIA_S3_DIR, PDD_MODEL_FILE, PDD_MODEL_PATH, PDD_BINARIZER_FILE, PDD_BINARIZER_PATH
+from constants import S3_BUCKET, USER_MEDIA_S3_DIR, MODEL_FILE, MODEL_PATH, BINARIZER_FILE, BINARIZER_PATH
 from utils import getRandomUUID, isUUIDValid, response, getImage
 
-logger = Logger("pdd-lambda", log_uncaught_exceptions=True)
+logger = Logger("inference-lambda", log_uncaught_exceptions=True)
 
 logger.info("Downloading Model")
 s3 = boto3.client("s3")
-s3.download_file(S3_BUCKET, PDD_MODEL_FILE, PDD_MODEL_PATH)
-s3.download_file(S3_BUCKET, PDD_BINARIZER_FILE, PDD_BINARIZER_PATH)
+s3.download_file(S3_BUCKET, MODEL_FILE, MODEL_PATH)
+s3.download_file(S3_BUCKET, BINARIZER_FILE, BINARIZER_PATH)
 
 logger.info("Loading Model")
-model = load_model(PDD_MODEL_PATH)
-with open(PDD_BINARIZER_PATH, "rb") as file:
+model = load_model(MODEL_PATH)
+with open(BINARIZER_PATH, "rb") as file:
     label_binarizer = pickle.load(file)
 
 def get_upload_url():
